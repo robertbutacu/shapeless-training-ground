@@ -2,7 +2,7 @@ package typeclass.derivation
 
 import java.util.Date
 
-import shapeless.{HList, ::, HNil}
+import shapeless.{::, Generic, HList, HNil, Lazy}
 
 trait PrettyPrinter[T] {
   def print(input: T): String
@@ -34,9 +34,13 @@ object PrettyPrinter {
     instance(_ => "")
 
   implicit def hListPrinter[H, T <: HList](implicit
-                                  headPrinter: PrettyPrinter[H],
+                                  headPrinter: Lazy[PrettyPrinter[H]],
                                   tailPrinter: PrettyPrinter[T]): PrettyPrinter[H :: T] = {
-    instance{case h::t => headPrinter.print(h) ++ tailPrinter.print(t)}
+    instance{case h::t => headPrinter.value.print(h) ++ tailPrinter.print(t)}
   }
 
+  //defining generic instance for all As
+  implicit def prettyPrinterGeneric[A, R](implicit gen: Generic.Aux[A, R], repr: Lazy[PrettyPrinter[R]]): PrettyPrinter[A] = {
+    PrettyPrinter.instance(a => repr.value.print(gen.to(a)))
+  }
 }
