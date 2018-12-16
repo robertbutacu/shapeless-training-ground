@@ -1,4 +1,4 @@
-package `type`.`class`.derivation
+package typeclass.derivation
 
 import java.util.Date
 
@@ -27,7 +27,7 @@ object PrettyPrinter {
   implicit val hnilEncoder: PrettyPrinter[HNil] =
     instance(_ => "")
 
-  implicit def hListPrinter[H, T](implicit
+  implicit def hListPrinter[H, T <: HList](implicit
                                   headPrinter: PrettyPrinter[H],
                                   tailPrinter: PrettyPrinter[T]): PrettyPrinter[H :: T] = {
     instance{case h::t => headPrinter.print(h) ++ tailPrinter.print(t)}

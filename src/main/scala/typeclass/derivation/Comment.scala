@@ -1,4 +1,4 @@
-package `type`.`class`.derivation
+package typeclass.derivation
 
 import java.util.Date
 
