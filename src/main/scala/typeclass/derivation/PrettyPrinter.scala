@@ -41,13 +41,12 @@ object PrettyPrinter {
     instance{case h::t => headPrinter.value.print(h) ++ tailPrinter.print(t)}
   }
 
-  implicit def coproductPrettyPrinter[H, T <: Coproduct](implicit h: PrettyPrinter[H], t: PrettyPrinter[T]): PrettyPrinter[H :+: T] = instance {
-    case Inl(a) => h.print(a)
+  implicit def coproductPrettyPrinter[H, T <: Coproduct](implicit h: Lazy[PrettyPrinter[H]], t: PrettyPrinter[T]): PrettyPrinter[H :+: T] = instance {
+    case Inl(a) => h.value.print(a)
     case Inr(b) => t.print(b)
   }
 
   //defining generic instance for all coproducts - case classes
-
   implicit def productPrettyPrinter[A, R](implicit gen: Generic.Aux[A, R], repr: Lazy[PrettyPrinter[R]]): PrettyPrinter[A] = {
     PrettyPrinter.instance(a => repr.value.print(gen.to(a)))
   }
