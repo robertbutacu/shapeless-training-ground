@@ -23,8 +23,14 @@ object PrettyPrinter {
   implicit def datePrinter: PrettyPrinter[Date] =
     instance(d => d.toString + "\t\t")
 
+  implicit def listPrinter[A](implicit impl: PrettyPrinter[A] ): PrettyPrinter[List[A]] =
+    instance{
+      l =>
+        l.map(v => impl.print(v)).foldLeft("[")((acc, curr) => acc ++ "\t" ++ curr ++ ",\t") ++ "]"
+    }
+
   //defining instances for HList elements
-  implicit val hnilEncoder: PrettyPrinter[HNil] =
+  implicit val hNilPrinter: PrettyPrinter[HNil] =
     instance(_ => "")
 
   implicit def hListPrinter[H, T <: HList](implicit
